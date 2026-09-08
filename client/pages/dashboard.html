@@ -26,10 +26,12 @@
           </span>
         </div>
         <p class="text-xs font-medium text-emerald-800/80 mt-0.5" id="dashboard-family-label">Patil Family</p>
+      </div>
       <div class="flex items-center gap-2">
-        <a href="features.html" class="px-2.5 py-1.5 rounded-xl bg-emerald-100/70 hover:bg-emerald-200 text-emerald-800 text-xs font-bold transition-all" title="View all features">
-          ✨ Features
-        </a>
+        <button id="btn-open-drawer" class="btn-open-drawer px-3 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95" aria-label="Open All Features Menu">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          <span>All Features</span>
+        </button>
         <a href="notifications.html" class="relative p-2.5 rounded-full bg-white border border-gray-100 shadow-sm hover:bg-gray-50 active:scale-95 transition-all" id="notif-bell" aria-label="Notifications" data-i18n-aria="notifications.title">
           <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
           <span id="notif-badge" class="unread-dot hidden"></span>
@@ -196,5 +198,6 @@
   </nav>
 
   <script type="module" src="../js/dashboard.js"></script>
+  <script type="module" src="../js/drawer.js"></script>
 </body>
 </html>

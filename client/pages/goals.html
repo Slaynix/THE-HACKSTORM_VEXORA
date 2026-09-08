@@ -27,9 +27,10 @@
         </div>
       </div>
       <div class="flex items-center gap-2">
-        <a href="features.html" class="px-2.5 py-1.5 rounded-xl bg-emerald-100/70 hover:bg-emerald-200 text-emerald-800 text-xs font-bold transition-all" title="View all features">
-          ✨ Features
-        </a>
+        <button id="btn-open-drawer" class="btn-open-drawer px-3 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95" aria-label="Open All Features Menu">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          <span>All Features</span>
+        </button>
         <a href="create-goal.html" class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 active:scale-95 transition-all shadow-sm min-h-[44px]">
           <span>➕</span>
           <span data-i18n="goals.createButton">+ New Goal</span>
@@ -79,5 +80,6 @@
   </nav>
 
   <script type="module" src="../js/goals.js"></script>
+  <script type="module" src="../js/drawer.js"></script>
 </body>
 </html>

@@ -30,6 +30,7 @@ const APP_SHELL_URLS = [
   '/js/dashboard.js',
   '/js/db.js',
   '/js/deposits.js',
+  '/js/drawer.js',
   '/js/goal-details.js',
   '/js/goals.js',
   '/js/i18n.js',

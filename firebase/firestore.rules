@@ -1,0 +1,122 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helper Functions ────────────────────────────────────────────────────────
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+
+    // Resolves authenticated user document
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    // Checks whether the caller is a verified member of the given familyId
+    function isFamilyMember(familyId) {
+      return isAuthenticated() && (
+        getUserData().familyId == familyId ||
+        exists(/databases/$(database)/documents/familyMembers/$(familyId + '_' + request.auth.uid))
+      );
+    }
+
+    // Validates that immutable fields cannot be altered on update
+    function immutableFieldsPreserved() {
+      return request.resource.data.familyId == resource.data.familyId
+          && request.resource.data.createdAt == resource.data.createdAt;
+    }
+
+    // ── 1. Users Collection ───────────────────────────────────────────────────
+    // Only that specific user can read/write their own profile
+    match /users/{userId} {
+      allow read:   if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.createdAt != null;
+      allow update: if isOwner(userId) && request.resource.data.createdAt == resource.data.createdAt;
+      allow delete: if isOwner(userId);
+    }
+
+    // ── 2. Families Collection ────────────────────────────────────────────────
+    // Accessible only to members belonging to that family
+    match /families/{familyId} {
+      allow read:   if isFamilyMember(familyId);
+      allow create: if isAuthenticated();
+      allow update: if isFamilyMember(familyId) && request.resource.data.createdAt == resource.data.createdAt;
+      allow delete: if isFamilyMember(familyId);
+    }
+
+    // ── 3. Family Members Collection ──────────────────────────────────────────
+    match /familyMembers/{memberId} {
+      allow read:   if isFamilyMember(resource.data.familyId);
+      allow create: if isFamilyMember(request.resource.data.familyId);
+      allow update: if isFamilyMember(resource.data.familyId) && immutableFieldsPreserved();
+      allow delete: if isFamilyMember(resource.data.familyId);
+    }
+
+    // ── 4. Goals Collection ───────────────────────────────────────────────────
+    match /goals/{goalId} {
+      allow read:   if isFamilyMember(resource.data.familyId);
+      allow create: if isFamilyMember(request.resource.data.familyId);
+      allow update: if isFamilyMember(resource.data.familyId) && immutableFieldsPreserved();
+      allow delete: if isFamilyMember(resource.data.familyId);
+
+      // Subcollection for deposits if nested
+      match /deposits/{depositId} {
+        allow read:   if isFamilyMember(get(/databases/$(database)/documents/goals/$(goalId)).data.familyId);
+        allow create: if isFamilyMember(get(/databases/$(database)/documents/goals/$(goalId)).data.familyId);
+        allow update: if isFamilyMember(get(/databases/$(database)/documents/goals/$(goalId)).data.familyId);
+        allow delete: if isFamilyMember(get(/databases/$(database)/documents/goals/$(goalId)).data.familyId);
+      }
+    }
+
+    // ── 5. Deposits Collection (Top-Level) ────────────────────────────────────
+    match /deposits/{depositId} {
+      allow read:   if isFamilyMember(resource.data.familyId);
+      allow create: if isFamilyMember(request.resource.data.familyId);
+      allow update: if isFamilyMember(resource.data.familyId) && immutableFieldsPreserved();
+      allow delete: if isFamilyMember(resource.data.familyId);
+    }
+
+    // ── 6. Milestones Collection ──────────────────────────────────────────────
+    match /milestones/{milestoneId} {
+      allow read:   if isFamilyMember(resource.data.familyId);
+      allow create: if isFamilyMember(request.resource.data.familyId);
+      allow update: if isFamilyMember(resource.data.familyId) && immutableFieldsPreserved();
+      allow delete: if isFamilyMember(resource.data.familyId);
+    }
+
+    // ── 7. Notifications Collection ───────────────────────────────────────────
+    match /notifications/{notifId} {
+      allow read:   if isFamilyMember(resource.data.familyId);
+      allow create: if isFamilyMember(request.resource.data.familyId);
+      allow update: if isFamilyMember(resource.data.familyId) && immutableFieldsPreserved();
+      allow delete: if isFamilyMember(resource.data.familyId);
+    }
+
+    // ── 8. Saving Streaks Collection ──────────────────────────────────────────
+    match /savingStreaks/{streakId} {
+      allow read:   if isFamilyMember(resource.data.familyId);
+      allow create: if isFamilyMember(request.resource.data.familyId);
+      allow update: if isFamilyMember(resource.data.familyId) && immutableFieldsPreserved();
+      allow delete: if isFamilyMember(resource.data.familyId);
+    }
+
+    // ── 9. Voice Transactions Collection ──────────────────────────────────────
+    match /voiceTransactions/{txnId} {
+      allow read:   if isFamilyMember(resource.data.familyId);
+      allow create: if isFamilyMember(request.resource.data.familyId);
+      allow update: if isFamilyMember(resource.data.familyId) && immutableFieldsPreserved();
+      allow delete: if isFamilyMember(resource.data.familyId);
+    }
+
+    // ── Default Deny ──────────────────────────────────────────────────────────
+    // No blanket access anywhere
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

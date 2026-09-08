@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Set up your Sanchay+ account — the smart micro-savings companion." />
+  <title>Get Started | Sanchay+</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/output.css" />
+</head>
+<body class="bg-emerald-50/40 min-h-screen flex flex-col text-gray-900">
+
+  <main class="flex-1 flex flex-col max-w-md mx-auto w-full px-6 py-8">
+
+    <!-- Header -->
+    <header class="text-center mb-8">
+      <h1 id="onboarding-title" class="text-2xl font-black text-emerald-800 tracking-tight mb-2" data-i18n="onboarding.title">Let's set up your account</h1>
+      <!-- Progress dots -->
+      <div class="progress-dots" id="progress-dots" aria-label="Setup progress">
+        <span class="progress-dot active" data-step="1"></span>
+        <span class="progress-dot" data-step="2"></span>
+      </div>
+    </header>
+
+    <!-- Step 1: Names -->
+    <section id="step-1" class="flex-1 flex flex-col">
+      <div class="card space-y-5 flex-1">
+        <div>
+          <label for="input-family-name" class="form-label font-bold text-gray-900" id="label-family-name" data-i18n="onboarding.familyName">Family Name</label>
+          <input id="input-family-name" type="text" class="form-input text-base" placeholder="e.g. Patil" data-i18n-placeholder="onboarding.familyPlaceholder" autocomplete="family-name" required />
+        </div>
+        <div>
+          <label for="input-member-name" class="form-label font-bold text-gray-900" id="label-member-name" data-i18n="onboarding.memberName">Your Name</label>
+          <input id="input-member-name" type="text" class="form-input text-base" placeholder="e.g. Arun" data-i18n-placeholder="onboarding.memberPlaceholder" autocomplete="given-name" required />
+        </div>
+      </div>
+      <div class="mt-6">
+        <button id="btn-next" class="btn-primary w-full shadow-md min-h-[48px] text-base" disabled data-i18n="onboarding.next">Next</button>
+      </div>
+    </section>
+
+    <!-- Step 2: Language preference -->
+    <section id="step-2" class="flex-1 flex-col hidden">
+      <div class="card space-y-4 flex-1">
+        <p id="label-preferred-lang" class="form-label text-base font-bold text-gray-900" data-i18n="onboarding.preferredLang">Preferred Language</p>
+        <div class="space-y-3">
+          <label class="flex items-center gap-3 p-3 rounded-2xl border-2 border-gray-200 cursor-pointer min-h-[52px] transition-all hover:border-emerald-400 lang-radio-label">
+            <input type="radio" name="language" value="en" class="w-5 h-5 accent-emerald-600" checked />
+            <span class="text-base font-bold text-gray-800">English</span>
+          </label>
+          <label class="flex items-center gap-3 p-3 rounded-2xl border-2 border-gray-200 cursor-pointer min-h-[52px] transition-all hover:border-emerald-400 lang-radio-label">
+            <input type="radio" name="language" value="hi" class="w-5 h-5 accent-emerald-600" />
+            <span class="text-base font-bold text-gray-800">हिंदी</span>
+          </label>
+          <label class="flex items-center gap-3 p-3 rounded-2xl border-2 border-gray-200 cursor-pointer min-h-[52px] transition-all hover:border-emerald-400 lang-radio-label">
+            <input type="radio" name="language" value="mr" class="w-5 h-5 accent-emerald-600" />
+            <span class="text-base font-bold text-gray-800">मराठी</span>
+          </label>
+        </div>
+      </div>
+      <div class="mt-6 space-y-3">
+        <button id="btn-get-started" class="btn-primary w-full text-base py-3.5 shadow-md min-h-[48px]" data-i18n="onboarding.getStarted">Get Started →</button>
+        <button id="btn-back" class="btn-ghost w-full min-h-[44px]" data-i18n="onboarding.back">Back</button>
+      </div>
+    </section>
+
+  </main>
+
+  <script type="module">
+    import { t, setLanguage, getLanguage, applyI18n } from '../js/i18n.js';
+    import { saveMockUser, authFetch } from '../js/auth.js';
+    import { initOfflineListeners } from '../js/ui-states.js';
+
+    initOfflineListeners();
+    applyI18n();
+
+    // ── DOM refs ─────────────────────────────────────────────────────────────
+    const step1        = document.getElementById('step-1');
+    const step2        = document.getElementById('step-2');
+    const dots         = document.querySelectorAll('.progress-dot');
+    const familyInput  = document.getElementById('input-family-name');
+    const memberInput  = document.getElementById('input-member-name');
+    const btnNext      = document.getElementById('btn-next');
+    const btnBack      = document.getElementById('btn-back');
+    const btnStart     = document.getElementById('btn-get-started');
+
+    // ── Pre-select language from landing choice ──────────────────────────────
+    const currentLang = getLanguage();
+    const langRadio = document.querySelector(`input[name="language"][value="${currentLang}"]`);
+    if (langRadio) langRadio.checked = true;
+
+    // ── Step navigation ──────────────────────────────────────────────────────
+    function showStep(num) {
+      step1.classList.toggle('hidden', num !== 1);
+      step1.classList.toggle('flex', num === 1);
+      step2.classList.toggle('hidden', num !== 2);
+      step2.classList.toggle('flex', num === 2);
+      dots.forEach(d => {
+        const s = parseInt(d.dataset.step);
+        d.classList.toggle('active', s === num);
+      });
+    }
+
+    // ── Enable Next only when both names filled ──────────────────────────────
+    function validateStep1() {
+      const valid = familyInput.value.trim().length > 0 && memberInput.value.trim().length > 0;
+      btnNext.disabled = !valid;
+    }
+    familyInput.addEventListener('input', validateStep1);
+    memberInput.addEventListener('input', validateStep1);
+
+    btnNext.addEventListener('click', () => showStep(2));
+    btnBack.addEventListener('click', () => showStep(1));
+
+    // ── Complete onboarding ──────────────────────────────────────────────────
+    btnStart.addEventListener('click', async () => {
+      btnStart.disabled = true;
+      btnStart.textContent = t('common.syncing');
+
+      const selectedLang = document.querySelector('input[name="language"]:checked')?.value || 'en';
+      setLanguage(selectedLang);
+
+      const userData = {
+        familyName: familyInput.value.trim(),
+        memberName: memberInput.value.trim(),
+        language:   selectedLang,
+      };
+
+      saveMockUser(userData);
+
+      // Try registering with backend
+      try {
+        await authFetch('/api/auth/register', {
+          method: 'POST',
+          body: JSON.stringify({
+            familyName: userData.familyName,
+            memberName: userData.memberName,
+            email: `${userData.familyName.toLowerCase().replace(/\s+/g, '')}@sanchay.local`,
+            password: 'Password123!',
+            language: selectedLang,
+          }),
+        });
+      } catch (_) {}
+
+      window.location.href = 'dashboard.html';
+    });
+
+    // ── Highlight selected radio label and live update language ──────────────
+    document.querySelectorAll('.lang-radio-label').forEach(label => {
+      const radio = label.querySelector('input[type="radio"]');
+      radio.addEventListener('change', () => {
+        document.querySelectorAll('.lang-radio-label').forEach(l => {
+          l.classList.remove('border-emerald-600', 'bg-emerald-50');
+          l.classList.add('border-gray-200');
+        });
+        if (radio.checked) {
+          label.classList.add('border-emerald-600', 'bg-emerald-50');
+          label.classList.remove('border-gray-200');
+          setLanguage(radio.value);
+          applyI18n();
+        }
+      });
+      // Init state
+      if (radio.checked) {
+        label.classList.add('border-emerald-600', 'bg-emerald-50');
+        label.classList.remove('border-gray-200');
+      }
+    });
+  </script>
+</body>
+</html>

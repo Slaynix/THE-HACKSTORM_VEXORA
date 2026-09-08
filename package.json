@@ -1,0 +1,33 @@
+{
+  "name": "sanchay-plus",
+  "version": "1.0.0",
+  "description": "Sanchay+ — Smart Micro-Savings Companion for rural families",
+  "main": "server/server.js",
+  "scripts": {
+    "dev": "nodemon server/server.js",
+    "start": "node server/server.js",
+    "seed": "node server/scripts/seed.js",
+    "test": "node server/tests/savingsEngine.test.js && node server/tests/api.test.js && node server/tests/phase3Firebase.test.js && node server/tests/phase5EndToEnd.test.js && node server/tests/phase6Chat.test.js && node server/tests/phase7OfflineSync.test.js && node server/tests/phase8CalendarRecovery.test.js",
+    "build:css": "tailwindcss -i ./client/css/input.css -o ./client/css/output.css",
+    "watch:css": "tailwindcss -i ./client/css/input.css -o ./client/css/output.css --watch"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-validator": "^7.2.0",
+    "firebase-admin": "^12.3.0",
+    "helmet": "^7.1.0",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4",
+    "tailwindcss": "^3.4.7"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "Sanchay+ Team",
+  "license": "MIT"
+}

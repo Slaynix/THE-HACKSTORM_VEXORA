@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Savings Calendar and Plan Recovery — Sanchay+." />
+  <title>Savings Calendar | Sanchay+</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/output.css" />
+</head>
+<body class="bg-emerald-50/40 text-gray-900 min-h-screen has-bottom-nav">
+
+  <!-- ── Main content ──────────────────────────────────────────────────────── -->
+  <main class="max-w-lg mx-auto px-4 pt-5 pb-24">
+
+    <!-- Header with Back & Title -->
+    <header class="flex items-center justify-between mb-5">
+      <div class="flex items-center gap-3">
+        <a href="dashboard.html" class="p-2 -ml-2 rounded-xl text-gray-600 hover:bg-gray-100 active:scale-95 transition-all min-h-[44px] min-w-[44px] flex items-center justify-center" aria-label="Go to Dashboard">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+        </a>
+        <div>
+          <h1 class="text-xl font-extrabold text-gray-900" data-i18n="calendar.title">Savings Calendar</h1>
+          <p class="text-xs text-gray-500 font-medium" data-i18n="calendar.subtitle">Record of your daily and monthly savings</p>
+        </div>
+      </div>
+      <a href="add-saving.html" class="btn-primary text-xs py-2 px-3 flex items-center gap-1.5 shadow-sm min-h-[40px]">
+        <span>+</span>
+        <span data-i18n="dashboard.addSavings">Add Savings</span>
+      </a>
+    </header>
+
+    <!-- Month Navigation & Mode Switcher -->
+    <section class="card mb-4 p-3.5">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <button id="cal-prev-btn" class="w-9 h-9 rounded-lg border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 active:scale-95 transition-all min-h-[36px] min-w-[36px]" aria-label="Previous Month">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+          </button>
+          <h2 id="cal-month-year" class="text-base font-extrabold text-gray-900 tracking-tight">September 2026</h2>
+          <button id="cal-next-btn" class="w-9 h-9 rounded-lg border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 active:scale-95 transition-all min-h-[36px] min-w-[36px]" aria-label="Next Month">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+        <button id="cal-today-btn" class="text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2.5 py-1.5 rounded-lg active:scale-95 transition-all min-h-[36px]" data-i18n="calendar.today">
+          Today
+        </button>
+      </div>
+
+      <!-- View Tabs: Daily vs Monthly Target -->
+      <div class="flex rounded-xl bg-gray-100 p-1 border border-gray-200">
+        <button id="tab-daily-view" class="flex-1 py-1.5 text-xs font-bold rounded-lg transition-all bg-white text-emerald-800 shadow-sm min-h-[36px]" data-i18n="calendar.dailyView">
+          Daily View
+        </button>
+        <button id="tab-monthly-view" class="flex-1 py-1.5 text-xs font-bold rounded-lg transition-all text-gray-500 hover:text-gray-900 min-h-[36px]" data-i18n="calendar.monthlyView">
+          Monthly View
+        </button>
+      </div>
+    </section>
+
+    <!-- Monthly Summary Stat Cards (4-grid) -->
+    <section class="grid grid-cols-2 gap-2.5 mb-4">
+      <div class="card p-3 border-emerald-100">
+        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-0.5" data-i18n="calendar.totalSaved">Total Saved</span>
+        <span id="cal-stat-saved" class="text-lg font-black text-emerald-700">₹0</span>
+      </div>
+      <div class="card p-3 border-blue-100">
+        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-0.5" data-i18n="calendar.monthTarget">Monthly Target</span>
+        <span id="cal-stat-target" class="text-lg font-black text-gray-900">₹0</span>
+      </div>
+      <div class="card p-3 border-emerald-100">
+        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-0.5" data-i18n="calendar.daysActive">Days Saved</span>
+        <div class="flex items-center gap-1.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+          <span id="cal-stat-days-saved" class="text-base font-extrabold text-gray-800">0</span>
+        </div>
+      </div>
+      <div class="card p-3 border-red-100">
+        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-0.5" data-i18n="calendar.missedDays">Missed Days</span>
+        <div class="flex items-center gap-1.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+          <span id="cal-stat-days-missed" class="text-base font-extrabold text-red-600">0</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Monthly Target Status Banner (Visible in Monthly View or when relevant) -->
+    <section id="monthly-target-card" class="card mb-4 p-3.5 border-emerald-200 hidden bg-gradient-to-r from-emerald-50 to-white">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs font-bold text-gray-700 uppercase tracking-wider" data-i18n="calendar.monthTarget">Monthly Target</span>
+        <span id="monthly-status-badge" class="badge badge-success text-[11px] font-bold">
+          Target Completed 🎉
+        </span>
+      </div>
+      <div class="w-full bg-gray-200 rounded-full h-2.5 mb-2 overflow-hidden">
+        <div id="monthly-target-bar" class="bg-emerald-600 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+      </div>
+      <p id="monthly-target-summary" class="text-xs font-semibold text-gray-600">
+        0% achieved · ₹0 remaining
+      </p>
+    </section>
+
+    <!-- Monthly Calendar Grid Card -->
+    <section id="calendar-grid-card" class="card mb-5 p-3.5 shadow-sm">
+      <!-- Days of Week Header -->
+      <div class="grid grid-cols-7 gap-1 text-center mb-2">
+        <span class="text-[11px] font-bold text-gray-400 uppercase">Mo</span>
+        <span class="text-[11px] font-bold text-gray-400 uppercase">Tu</span>
+        <span class="text-[11px] font-bold text-gray-400 uppercase">We</span>
+        <span class="text-[11px] font-bold text-gray-400 uppercase">Th</span>
+        <span class="text-[11px] font-bold text-gray-400 uppercase">Fr</span>
+        <span class="text-[11px] font-bold text-gray-400 uppercase">Sa</span>
+        <span class="text-[11px] font-bold text-gray-400 uppercase">Su</span>
+      </div>
+
+      <!-- Calendar Day Cells Container -->
+      <div id="calendar-days-container" class="grid grid-cols-7 gap-1">
+        <!-- Rendered dynamically by calendar.js -->
+      </div>
+
+      <!-- Legend Footer -->
+      <div class="mt-4 pt-3 border-t border-gray-100 flex items-center justify-around text-[10px] font-semibold text-gray-500">
+        <div class="flex items-center gap-1.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+          <span data-i18n="calendar.statusSaved">Saved</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+          <span data-i18n="calendar.statusMissed">Missed</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+          <span data-i18n="calendar.today">Today</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-gray-300"></span>
+          <span data-i18n="calendar.statusFuture">Planned</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Plan Adjustment & Recovery Section ─────────────────────────────── -->
+    <section class="card mb-5 p-4 border-amber-200 bg-amber-50/40 shadow-sm" aria-label="Savings Plan Adjustment">
+      <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">📈</span>
+          <div>
+            <h2 class="text-sm font-bold text-gray-900" data-i18n="recovery.title">Automatic Savings Recovery</h2>
+            <p class="text-[11px] text-gray-500" data-i18n="recovery.subtitle">Smart plan adjustment for missed savings</p>
+          </div>
+        </div>
+        <span id="recovery-status-pill" class="badge badge-warning text-[10px] font-bold">
+          Adjustment Needed
+        </span>
+      </div>
+
+      <div id="recovery-plan-card" class="bg-white rounded-xl p-3 border border-amber-100 shadow-xs mb-3 space-y-2.5">
+        <div class="flex items-center justify-between border-b border-gray-100 pb-2">
+          <span id="recovery-goal-name" class="text-xs font-extrabold text-gray-900">School Fees</span>
+          <span id="recovery-remaining-meta" class="text-xs font-bold text-emerald-700">₹10,000 remaining · 25 days</span>
+        </div>
+
+        <p id="recovery-notice-text" class="text-xs font-semibold text-gray-800 leading-relaxed">
+          Your saving plan has been adjusted. You now need to save ₹400/day to reach your goal by the deadline.
+        </p>
+
+        <!-- Metrics comparison grid -->
+        <div class="grid grid-cols-2 gap-2 pt-1 text-xs">
+          <div class="p-2 rounded-lg bg-gray-50 border border-gray-100">
+            <span class="text-[10px] font-bold text-gray-400 uppercase block" data-i18n="recovery.originalDaily">Original Required</span>
+            <span id="recovery-orig-rate" class="text-sm font-extrabold text-gray-800">₹333/day</span>
+          </div>
+          <div class="p-2 rounded-lg bg-amber-50 border border-amber-100">
+            <span class="text-[10px] font-bold text-amber-700 uppercase block" data-i18n="recovery.newRequired">New Required Daily</span>
+            <span id="recovery-adj-rate" class="text-sm font-black text-amber-900">₹400/day</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recovery Options Container -->
+      <div class="space-y-2">
+        <h3 class="text-xs font-bold text-gray-700 uppercase tracking-wider" data-i18n="recovery.chooseOption">Choose a Recovery Option</h3>
+        <div id="recovery-options-list" class="space-y-2">
+          <!-- Rendered dynamically with Option 1, Option 2, Option 3 -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── Day Detail Bottom Sheet / Modal ────────────────────────────────────── -->
+  <div id="day-detail-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 hidden transition-opacity">
+    <div class="w-full max-w-md bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl p-5 border border-gray-100 max-h-[85vh] overflow-y-auto transform transition-transform">
+      <div class="flex items-center justify-between mb-3 border-b border-gray-100 pb-3">
+        <div>
+          <span id="detail-date-label" class="text-xs font-bold text-gray-400 uppercase tracking-wider">Date</span>
+          <h3 id="detail-date-title" class="text-base font-extrabold text-gray-900">8 September 2026</h3>
+        </div>
+        <button id="close-detail-modal-btn" class="w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center active:scale-95 text-lg" aria-label="Close details">
+          ✕
+        </button>
+      </div>
+
+      <!-- Status badge & Total saved -->
+      <div class="flex items-center justify-between bg-emerald-50 rounded-xl p-3.5 border border-emerald-100 mb-4">
+        <div>
+          <span class="text-[10px] font-bold text-gray-500 uppercase block" data-i18n="calendar.amountSaved">Amount Saved</span>
+          <span id="detail-total-amount" class="text-xl font-black text-emerald-800">₹0</span>
+        </div>
+        <span id="detail-status-pill" class="badge badge-success text-xs font-bold">
+          Saved
+        </span>
+      </div>
+
+      <!-- List of Deposits recorded on this date -->
+      <div class="mb-4">
+        <h4 class="text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Deposits on this day</h4>
+        <div id="detail-deposits-list" class="space-y-2">
+          <p class="text-xs text-gray-500 italic py-2" data-i18n="calendar.noSavingsDay">No savings recorded on this date.</p>
+        </div>
+      </div>
+
+      <!-- Action Button -->
+      <div class="pt-2">
+        <a id="detail-add-saving-cta" href="add-saving.html" class="btn-primary w-full text-center block text-sm py-3 min-h-[44px]">
+          <span data-i18n="calendar.addSavingForDay">Add Saving for this Day</span> ➕
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Bottom Navigation Bar (6-item responsive layout) ──────────────────── -->
+  <nav class="bottom-nav" aria-label="Main navigation">
+    <a href="dashboard.html" class="bottom-nav-item">
+      <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0h4"/></svg>
+      <span data-i18n="nav.home">Home</span>
+    </a>
+    <a href="goals.html" class="bottom-nav-item">
+      <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+      <span data-i18n="nav.goals">Goals</span>
+    </a>
+    <a href="add-saving.html" class="bottom-nav-item" aria-label="Add Saving" data-i18n-aria="dashboard.addSavings">
+      <div class="w-12 h-12 bg-emerald-600 rounded-full flex items-center justify-center -mt-5 shadow-lg active:scale-95 transition-transform">
+        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+      </div>
+      <span data-i18n="nav.add" class="sr-only">Add</span>
+    </a>
+    <a href="calendar.html" class="bottom-nav-item active">
+      <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      <span data-i18n="nav.calendar">Calendar</span>
+    </a>
+    <a href="notifications.html" class="bottom-nav-item relative">
+      <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+      <span data-i18n="nav.notifications">Alerts</span>
+      <span id="nav-notif-badge" class="unread-dot hidden"></span>
+    </a>
+    <a href="settings.html" class="bottom-nav-item">
+      <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.573-1.066z"/><circle cx="12" cy="12" r="3"/></svg>
+      <span data-i18n="nav.settings">Settings</span>
+    </a>
+  </nav>
+
+  <script type="module" src="../js/calendar.js"></script>
+</body>
+</html>

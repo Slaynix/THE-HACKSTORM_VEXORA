@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Add a micro-saving deposit toward your goal — Sanchay+." />
+  <title>Add Saving | Sanchay+</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/output.css" />
+</head>
+<body class="bg-emerald-50/40 min-h-screen has-bottom-nav">
+
+  <!-- Screen reader live region for accessibility announcements -->
+  <div id="sr-announcement" class="sr-only" role="status" aria-live="polite"></div>
+
+  <main class="max-w-lg mx-auto px-4 pt-5 pb-8">
+
+    <!-- Top App Bar with Voice Button -->
+    <header class="flex items-center justify-between mb-5">
+      <div class="flex items-center gap-3">
+        <a href="dashboard.html" class="p-2 -ml-2 rounded-xl text-gray-600 hover:bg-gray-100 active:scale-95 transition-all min-h-[44px] min-w-[44px] flex items-center justify-center" aria-label="Go back to Dashboard">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+        </a>
+        <div>
+          <h1 class="text-xl font-extrabold text-gray-900" data-i18n="addSaving.title">Add a Saving</h1>
+          <p class="text-xs text-gray-500" data-i18n="dashboard.heroSubtitle">Save a small amount today to stay on track</p>
+        </div>
+      </div>
+      <button
+        type="button"
+        id="voice-save-trigger"
+        class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-emerald-200 text-xs font-bold text-emerald-800 shadow-sm hover:bg-emerald-50 active:scale-95 transition-all min-h-[44px]"
+        aria-label="Voice Save"
+      >
+        <span class="text-base">🎙️</span>
+        <span data-i18n="dashboard.voiceSave">Voice Save</span>
+      </button>
+    </header>
+
+    <!-- ── FORM VIEW ────────────────────────────────────────────────────────── -->
+    <div id="form-card" class="space-y-4">
+      <form id="add-saving-form" class="space-y-4" novalidate>
+
+        <!-- Quick Amounts -->
+        <section class="card">
+          <div class="flex items-center justify-between mb-2.5">
+            <label class="form-label font-bold text-gray-900 mb-0" data-i18n="addSaving.quickAmounts">Quick Amount</label>
+            <span class="text-[11px] text-gray-400 font-medium">₹10 - ₹200</span>
+          </div>
+          <div class="grid grid-cols-5 gap-2 mb-4">
+            <button type="button" class="quick-amount-btn" data-amount="10">₹10</button>
+            <button type="button" class="quick-amount-btn" data-amount="20">₹20</button>
+            <button type="button" class="quick-amount-btn" data-amount="50">₹50</button>
+            <button type="button" class="quick-amount-btn" data-amount="100">₹100</button>
+            <button type="button" class="quick-amount-btn" data-amount="200">₹200</button>
+          </div>
+
+          <!-- Custom Amount Input -->
+          <div>
+            <label for="custom-amount-input" class="text-xs font-medium text-gray-600 mb-1 block" data-i18n="addSaving.orCustom">or enter custom amount</label>
+            <div class="relative rounded-xl shadow-sm">
+              <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-gray-500 font-bold text-lg">
+                ₹
+              </div>
+              <input
+                type="number"
+                id="custom-amount-input"
+                class="form-input pl-9 bg-white text-lg font-bold"
+                placeholder="150"
+                data-i18n-placeholder="addSaving.customPlaceholder"
+                min="1"
+                step="1"
+                required
+              />
+            </div>
+          </div>
+        </section>
+
+        <!-- Goal Selector -->
+        <section class="card">
+          <label for="saving-goal-select" class="form-label font-bold text-gray-900 mb-1.5" data-i18n="addSaving.selectGoal">Which goal?</label>
+          <select id="saving-goal-select" class="form-input bg-white cursor-pointer font-medium text-gray-900" required>
+            <!-- Injected via deposits.js -->
+          </select>
+        </section>
+
+        <!-- Family Member Selector -->
+        <section class="card">
+          <label for="saving-member-select" class="form-label font-bold text-gray-900 mb-1.5">Who is saving?</label>
+          <select id="saving-member-select" class="form-input bg-white cursor-pointer font-medium text-gray-900" required>
+            <!-- Injected via deposits.js -->
+          </select>
+        </section>
+
+        <!-- Date & Note Details -->
+        <section class="card space-y-4">
+          <div>
+            <label for="saving-date" class="form-label font-bold text-gray-900 mb-1" data-i18n="addSaving.date">Date</label>
+            <input type="date" id="saving-date" class="form-input bg-white text-sm" />
+          </div>
+          <div>
+            <label for="saving-note" class="form-label font-bold text-gray-900 mb-1" data-i18n="addSaving.note">Note (optional)</label>
+            <input
+              type="text"
+              id="saving-note"
+              class="form-input bg-white text-sm"
+              placeholder="e.g. Weekly vegetable sale"
+              data-i18n-placeholder="addSaving.notePlaceholder"
+            />
+          </div>
+        </section>
+
+        <!-- Submit Button -->
+        <div class="pt-1">
+          <button
+            type="submit"
+            id="saving-submit-btn"
+            class="btn-primary w-full text-base py-3.5 shadow-md disabled:opacity-50 disabled:cursor-not-allowed min-h-[48px]"
+            disabled
+          >
+            <span data-i18n="addSaving.confirmDisabled">Select amount & goal</span>
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- ── SUCCESS VIEW (Hidden by default) ─────────────────────────────────── -->
+    <div id="saving-success-view" class="hidden card text-center py-8 px-5 space-y-5">
+      <!-- Animated Checkmark Circle -->
+      <div class="w-20 h-20 mx-auto rounded-full bg-emerald-100 flex items-center justify-center text-4xl text-emerald-600 shadow-inner">
+        ✓
+      </div>
+
+      <div>
+        <h2 class="text-2xl font-black text-gray-900 mb-1" data-i18n="addSaving.successTitle">Deposit Recorded! ✅</h2>
+        <p id="success-amount-text" class="text-3xl font-black text-emerald-700 mb-1">₹0</p>
+        <p id="success-goal-text" class="text-sm font-semibold text-gray-600">saved toward your goal!</p>
+      </div>
+
+      <!-- ── Milestone Celebration Box (Revealed when milestone achieved) ── -->
+      <div id="milestone-celebration-card" class="hidden p-4 rounded-2xl bg-gradient-to-br from-amber-50 to-yellow-100/80 border border-amber-200 text-center relative overflow-hidden animate-confetti-pop shadow-sm">
+        <div class="flex items-center justify-center gap-2 mb-2">
+          <div id="milestone-badge-display"></div>
+        </div>
+        <h3 id="milestone-celebration-title" class="text-base font-extrabold text-amber-900 mb-1">
+          Milestone Reached! 🏆
+        </h3>
+        <p id="milestone-celebration-msg" class="text-xs font-medium text-amber-800 leading-relaxed max-w-xs mx-auto">
+          You've saved a major milestone of your goal!
+        </p>
+      </div>
+
+      <div class="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-100 text-xs text-emerald-800 font-medium">
+        🎉 Your savings streak is protected. Consistency grows with care!
+      </div>
+
+      <div class="space-y-2.5 pt-2">
+        <a id="success-view-goal-btn" href="goals.html" class="btn-primary w-full py-3.5 min-h-[48px]">
+          <span data-i18n="addSaving.successCta">View Goal Details</span> →
+        </a>
+        <button type="button" id="success-add-another-btn" class="btn-secondary w-full py-3 min-h-[44px]" data-i18n="addSaving.addAnother">
+          + Add Another Saving
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── Bottom Navigation ────────────────────────────────────────────────── -->
+  <nav class="bottom-nav" aria-label="Main navigation">
+    <a href="dashboard.html" class="bottom-nav-item">
+      <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0h4"/></svg>
+      <span data-i18n="nav.home">Home</span>
+    </a>
+    <a href="goals.html" class="bottom-nav-item">
+      <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+      <span data-i18n="nav.goals">Goals</span>
+    </a>
+    <a href="add-saving.html" class="bottom-nav-item active" aria-label="Add Saving" data-i18n-aria="dashboard.addSavings">
+      <div class="w-12 h-12 bg-emerald-600 rounded-full flex items-center justify-center -mt-5 shadow-lg">
+        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+      </div>
+      <span data-i18n="nav.add" class="sr-only">Add</span>
+    </a>
+    <a href="calendar.html" class="bottom-nav-item">
+      <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      <span data-i18n="nav.calendar">Calendar</span>
+    </a>
+    <a href="notifications.html" class="bottom-nav-item relative">
+      <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+      <span data-i18n="nav.notifications">Alerts</span>
+    </a>
+    <a href="settings.html" class="bottom-nav-item">
+      <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.573-1.066z"/><circle cx="12" cy="12" r="3"/></svg>
+      <span data-i18n="nav.settings">Settings</span>
+    </a>
+  </nav>
+
+  <script type="module" src="../js/deposits.js"></script>
+</body>
+</html>

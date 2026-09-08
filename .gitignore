@@ -1,0 +1,23 @@
+# ── Dependencies ──────────────────────────────────────────────────────────────
+node_modules/
+
+# ── Environment & Secrets ───────────────────────────────────────────────────
+.env
+*.env.local
+*.env.*
+!.env.example
+*serviceAccountKey*.json
+service-account*.json
+firebase-credentials.json
+
+# ── OS / Editor ───────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.suo
+*.user
+
+# ── Logs ──────────────────────────────────────────────────────────────────────
+*.log
+npm-debug.log*

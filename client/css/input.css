@@ -1,0 +1,411 @@
+/* Tailwind CSS entry-point.
+   Run: npm run build:css   (or tailwindcss -i input.css -o output.css --watch)
+*/
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Project design tokens ──────────────────────────────────────────────────── */
+@layer base {
+  :root {
+    /* Brand palette */
+    --color-brand-primary:   #16a34a;  /* green-600  — ON TRACK  */
+    --color-brand-secondary: #d97706;  /* amber-600  — AT RISK   */
+    --color-brand-danger:    #dc2626;  /* red-600    — BEHIND    */
+    --color-brand-surface:   #f0fdf4;  /* green-50   — background */
+
+    /* Notification type colors */
+    --color-notif-reminder:  #2563eb;  /* blue-600   */
+    --color-notif-warning:   #d97706;  /* amber-600  */
+    --color-notif-milestone: #7c3aed;  /* violet-600 */
+    --color-notif-success:   #16a34a;  /* green-600  */
+  }
+
+  html {
+    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Prevent horizontal overflow globally */
+  body { overflow-x: hidden; }
+}
+
+/* ── Reusable component classes ──────────────────────────────────────────────── */
+@layer components {
+
+  /* ── Goal health-state badges (always paired with text — not color-only) ── */
+  .badge-on-track { @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800; }
+  .badge-at-risk  { @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800; }
+  .badge-behind   { @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100   text-red-800;   }
+
+  /* ── Primary CTA button (min 44px touch target) ────────────────────────── */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2
+           px-5 py-3 rounded-xl text-base font-semibold
+           bg-green-600 text-white min-h-[44px]
+           hover:bg-green-700 active:scale-[0.97]
+           transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2;
+  }
+
+  /* ── Secondary / ghost button ──────────────────────────────────────────── */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2
+           px-5 py-3 rounded-xl text-base font-semibold
+           border-2 border-green-600 text-green-700 min-h-[44px]
+           hover:bg-green-50 active:scale-[0.97]
+           transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2;
+  }
+
+  /* ── Ghost button (text only) ──────────────────────────────────────────── */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2
+           px-4 py-3 rounded-xl text-sm font-medium
+           text-gray-600 min-h-[44px]
+           hover:bg-gray-100 active:scale-[0.97]
+           transition-all duration-150 focus:outline-none;
+  }
+
+  /* ── Card ───────────────────────────────────────────────────────────────── */
+  .card {
+    @apply bg-white rounded-2xl shadow-sm border border-gray-100 p-4;
+  }
+
+  /* ── Stat card (dashboard) ─────────────────────────────────────────────── */
+  .stat-card {
+    @apply bg-white rounded-2xl shadow-sm border border-gray-100
+           p-3 flex flex-col items-center justify-center text-center
+           min-h-[80px];
+  }
+
+  /* ── Form input ────────────────────────────────────────────────────────── */
+  .form-input {
+    @apply block w-full rounded-xl border border-gray-300 px-4 py-3
+           text-base min-h-[44px]
+           focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500
+           transition-colors duration-150;
+  }
+
+  .form-label {
+    @apply block text-sm font-medium text-gray-700 mb-1.5;
+  }
+
+  /* ── Skeleton loading ──────────────────────────────────────────────────── */
+  .skeleton {
+    @apply bg-gray-200 rounded-xl relative overflow-hidden;
+    animation: shimmer 1.5s infinite;
+  }
+
+  .skeleton-text   { @apply h-4 w-3/4 mb-2; }
+  .skeleton-text-sm { @apply h-3 w-1/2 mb-2; }
+  .skeleton-circle { @apply rounded-full; }
+
+  .skeleton-card {
+    @apply bg-white rounded-2xl border border-gray-100 p-4 space-y-3;
+  }
+
+  /* ── Quick amount button (add-saving) ──────────────────────────────────── */
+  .quick-amount-btn {
+    @apply flex items-center justify-center
+           px-4 py-3 rounded-xl text-base font-semibold
+           border-2 border-gray-200 text-gray-700
+           min-h-[52px] min-w-[72px]
+           hover:border-green-400 active:scale-[0.95]
+           transition-all duration-150 cursor-pointer select-none;
+  }
+  .quick-amount-btn.selected {
+    @apply border-green-600 bg-green-50 text-green-700 ring-2 ring-green-200;
+  }
+
+  /* ── Category card (create-goal) ───────────────────────────────────────── */
+  .category-card {
+    @apply flex flex-col items-center justify-center gap-1.5
+           p-3 rounded-2xl border-2 border-gray-200
+           min-h-[80px] min-w-[80px]
+           cursor-pointer select-none
+           hover:border-green-400 active:scale-[0.95]
+           transition-all duration-150;
+  }
+  .category-card.selected {
+    @apply border-green-600 bg-green-50 ring-2 ring-green-200;
+  }
+  .category-card-icon { @apply text-2xl; }
+  .category-card-label { @apply text-xs font-medium text-gray-700 text-center; }
+
+  /* ── Milestone badge ───────────────────────────────────────────────────── */
+  .milestone-badge {
+    @apply flex flex-col items-center justify-center gap-1
+           w-16 h-16 rounded-full border-2 text-center;
+  }
+  .milestone-badge.locked {
+    @apply border-gray-300 bg-gray-50 text-gray-400;
+  }
+  .milestone-badge.achieved {
+    @apply border-green-500 bg-green-50 text-green-700;
+  }
+
+  /* ── Progress ring (SVG) ───────────────────────────────────────────────── */
+  .progress-ring-circle {
+    transition: stroke-dashoffset 0.8s ease-in-out;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+  }
+
+  /* ── Notification type borders ─────────────────────────────────────────── */
+  .notif-reminder  { border-left: 4px solid var(--color-notif-reminder); }
+  .notif-warning   { border-left: 4px solid var(--color-notif-warning); }
+  .notif-milestone { border-left: 4px solid var(--color-notif-milestone); }
+  .notif-success   { border-left: 4px solid var(--color-notif-success); }
+
+  .notif-icon-reminder  { @apply text-blue-600; }
+  .notif-icon-warning   { @apply text-amber-600; }
+  .notif-icon-milestone { @apply text-violet-600; }
+  .notif-icon-success   { @apply text-green-600; }
+
+  /* ── Unread dot ────────────────────────────────────────────────────────── */
+  .unread-dot {
+    @apply w-2.5 h-2.5 rounded-full bg-red-500 absolute -top-0.5 -right-0.5;
+  }
+
+  /* ── Bottom nav bar ────────────────────────────────────────────────────── */
+  .bottom-nav {
+    @apply fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200
+           flex justify-around items-center
+           h-16 z-50;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .bottom-nav-item {
+    @apply flex flex-col items-center justify-center gap-0.5
+           py-1 px-2 text-gray-400 text-[10px] font-medium
+           min-w-[56px] min-h-[44px]
+           transition-colors duration-150;
+  }
+  .bottom-nav-item.active {
+    @apply text-green-600;
+  }
+  .bottom-nav-item svg,
+  .bottom-nav-item .nav-icon {
+    @apply w-6 h-6;
+  }
+
+  /* ── Offline banner ────────────────────────────────────────────────────── */
+  .offline-banner {
+    @apply fixed top-0 left-0 right-0 z-[60]
+           bg-amber-500 text-white text-xs font-medium
+           text-center py-2 px-4
+           transform -translate-y-full transition-transform duration-300;
+  }
+  .offline-banner.visible {
+    @apply translate-y-0;
+  }
+
+  /* ── Syncing indicator ─────────────────────────────────────────────────── */
+  .syncing-bar {
+    @apply fixed top-0 left-0 right-0 h-1 z-[60]
+           bg-green-200 overflow-hidden opacity-0 transition-opacity duration-300;
+  }
+  .syncing-bar.visible { @apply opacity-100; }
+  .syncing-bar::after {
+    content: '';
+    @apply absolute inset-0 bg-green-500;
+    animation: syncing-slide 1.2s infinite ease-in-out;
+  }
+
+  /* ── Toast / snackbar ──────────────────────────────────────────────────── */
+  .toast {
+    @apply fixed bottom-20 left-4 right-4 z-[70]
+           bg-gray-800 text-white text-sm font-medium
+           rounded-xl px-4 py-3 text-center
+           shadow-lg
+           transform translate-y-4 opacity-0
+           transition-all duration-300;
+    pointer-events: none;
+  }
+  .toast.visible {
+    @apply translate-y-0 opacity-100;
+    pointer-events: auto;
+  }
+  .toast.toast-success { @apply bg-green-700; }
+  .toast.toast-error   { @apply bg-red-600; }
+
+  /* ── Onboarding progress dots ──────────────────────────────────────────── */
+  .progress-dots {
+    @apply flex items-center justify-center gap-2;
+  }
+  .progress-dot {
+    @apply w-2.5 h-2.5 rounded-full bg-gray-300 transition-all duration-300;
+  }
+  .progress-dot.active {
+    @apply bg-green-600 w-6;
+  }
+
+  /* ── Page header with back button ──────────────────────────────────────── */
+  .page-header {
+    @apply flex items-center gap-3 py-4;
+  }
+  .page-header-back {
+    @apply flex items-center justify-center w-10 h-10 rounded-full
+           hover:bg-gray-100 active:scale-[0.9]
+           transition-all duration-150 cursor-pointer;
+  }
+  .page-header-title {
+    @apply text-lg font-bold text-gray-900;
+  }
+
+  /* ── Toggle switch ─────────────────────────────────────────────────────── */
+  .toggle-switch {
+    @apply relative inline-flex h-7 w-12 items-center rounded-full
+           transition-colors duration-200 cursor-pointer;
+  }
+  .toggle-switch.off  { @apply bg-gray-300; }
+  .toggle-switch.on   { @apply bg-green-500; }
+  .toggle-knob {
+    @apply inline-block h-5 w-5 rounded-full bg-white shadow
+           transform transition-transform duration-200;
+  }
+  .toggle-switch.on .toggle-knob  { @apply translate-x-6; }
+  .toggle-switch.off .toggle-knob { @apply translate-x-1; }
+
+  /* ── Danger button ──────────────────────────────────────────────────────── */
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2
+           px-5 py-3 rounded-xl text-base font-semibold
+           bg-red-600 text-white min-h-[44px]
+           hover:bg-red-700 active:scale-[0.97]
+           transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2;
+  }
+
+  /* ── Form error states ─────────────────────────────────────────────────── */
+  .form-input-error {
+    @apply border-red-500 bg-red-50/30 focus:border-red-600 focus:ring-red-200;
+  }
+  .form-error-msg {
+    @apply text-xs text-red-600 font-medium mt-1 flex items-center gap-1;
+  }
+
+  /* ── Hero cards ────────────────────────────────────────────────────────── */
+  .card-hero {
+    @apply bg-gradient-to-br from-emerald-700 via-green-600 to-teal-700 text-white rounded-3xl p-5 shadow-lg relative overflow-hidden;
+  }
+  .card-secondary {
+    @apply bg-white rounded-2xl shadow-sm border border-emerald-100 p-4 relative;
+  }
+
+  /* ── Prediction card ───────────────────────────────────────────────────── */
+  .prediction-card {
+    @apply bg-gradient-to-br from-white to-emerald-50/60 rounded-2xl border border-emerald-100 p-4 shadow-sm;
+  }
+
+  /* ── Status pills ──────────────────────────────────────────────────────── */
+  .status-pill-synced  { @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800; }
+  .status-pill-syncing { @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 animate-pulse; }
+  .status-pill-offline { @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-200 text-gray-700; }
+
+  /* ── 100% Milestone Special Badge ──────────────────────────────────────── */
+  .milestone-badge-100 {
+    @apply flex flex-col items-center justify-center gap-1
+           w-20 h-20 rounded-full border-2 text-center transition-transform duration-300;
+  }
+  .milestone-badge-100.achieved {
+    @apply border-amber-400 bg-gradient-to-br from-amber-100 via-yellow-50 to-amber-200 text-amber-800 shadow-md scale-105;
+  }
+  .milestone-badge-100.locked {
+    @apply border-gray-300 bg-gray-50 text-gray-400;
+  }
+
+  /* ── Bottom Sheet & Modal Backdrop ─────────────────────────────────────── */
+  .sheet-backdrop {
+    @apply fixed inset-0 bg-black/40 backdrop-blur-sm z-50 opacity-0 pointer-events-none transition-opacity duration-200;
+  }
+  .sheet-backdrop.active {
+    @apply opacity-100 pointer-events-auto;
+  }
+  .bottom-sheet {
+    @apply fixed bottom-0 left-0 right-0 max-w-lg mx-auto bg-white rounded-t-3xl p-5 shadow-2xl z-50
+           transform translate-y-full transition-transform duration-300 ease-out;
+    padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+  }
+  .bottom-sheet.active {
+    @apply translate-y-0;
+  }
+
+  /* ── Voice Wave Animation ──────────────────────────────────────────────── */
+  .voice-mic-container {
+    @apply relative flex items-center justify-center w-24 h-24 mx-auto mb-3;
+  }
+  .voice-pulse-ring {
+    @apply absolute inset-0 rounded-full bg-emerald-400 opacity-30;
+    animation: voice-wave 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+  .voice-pulse-ring:nth-child(2) {
+    animation-delay: 0.5s;
+  }
+
+  /* ── Extended Notifications ────────────────────────────────────────────── */
+  .notif-risk      { border-left: 4px solid #dc2626; }
+  .notif-deadline  { border-left: 4px solid #ea580c; }
+  .notif-completed { border-left: 4px solid #059669; }
+
+  .notif-icon-risk      { @apply text-red-600 bg-red-50; }
+  .notif-icon-deadline  { @apply text-orange-600 bg-orange-50; }
+  .notif-icon-completed { @apply text-emerald-600 bg-emerald-50; }
+}
+
+@keyframes voice-wave {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+@keyframes confetti-pop {
+  0% {
+    transform: scale(0.6) translateY(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) translateY(-10px);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-confetti-pop {
+  animation: confetti-pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+
+/* ── Keyframe animations ─────────────────────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -200px 0; }
+  100% { background-position: calc(200px + 100%) 0; }
+}
+
+.skeleton {
+  background-image: linear-gradient(90deg, #e5e7eb 0px, #f3f4f6 50%, #e5e7eb 100%);
+  background-size: 200px 100%;
+  background-repeat: no-repeat;
+}
+
+@keyframes syncing-slide {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes bounce-in {
+  0%   { transform: scale(0); opacity: 0; }
+  50%  { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ── Utility: safe area padding for pages with bottom nav ────────────────── */
+.has-bottom-nav {
+  padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px) + 1rem);
+}

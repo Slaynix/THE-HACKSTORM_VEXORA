@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Manage all your savings goals — Sanchay+." />
+  <title>My Goals | Sanchay+</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/output.css" />
+</head>
+<body class="bg-emerald-50/40 min-h-screen has-bottom-nav">
+
+  <!-- ── Main Content ──────────────────────────────────────────────────────── -->
+  <main class="max-w-lg mx-auto px-4 pt-5 pb-6">
+
+    <!-- Top App Bar -->
+    <header class="flex items-center justify-between mb-5">
+      <div class="flex items-center gap-3">
+        <a href="dashboard.html" class="p-2 -ml-2 rounded-xl text-gray-600 hover:bg-gray-100 active:scale-95 transition-all min-h-[44px] min-w-[44px] flex items-center justify-center" aria-label="Go back to Dashboard">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+        </a>
+        <div>
+          <h1 class="text-xl font-extrabold text-gray-900" id="goals-page-title" data-i18n="goals.title">My Goals</h1>
+          <p class="text-xs text-gray-500" data-i18n="dashboard.activeGoalsTitle">Track and manage your savings milestones</p>
+        </div>
+      </div>
+      <a href="create-goal.html" class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 active:scale-95 transition-all shadow-sm min-h-[44px]">
+        <span>➕</span>
+        <span data-i18n="goals.createButton">+ New Goal</span>
+      </a>
+    </header>
+
+    <!-- Goals List Container -->
+    <div id="goals-container" class="space-y-3 mb-6"></div>
+
+  </main>
+
+  <!-- ── Bottom Navigation ────────────────────────────────────────────────── -->
+  <nav class="bottom-nav" aria-label="Main navigation">
+    <a href="dashboard.html" class="bottom-nav-item">
+      <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0h4"/></svg>
+      <span data-i18n="nav.home">Home</span>
+    </a>
+    <a href="goals.html" class="bottom-nav-item active">
+      <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+      <span data-i18n="nav.goals">Goals</span>
+    </a>
+    <a href="add-saving.html" class="bottom-nav-item" aria-label="Add Saving" data-i18n-aria="dashboard.addSavings">
+      <div class="w-12 h-12 bg-emerald-600 rounded-full flex items-center justify-center -mt-5 shadow-lg">
+        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+      </div>
+      <span data-i18n="nav.add" class="sr-only">Add</span>
+    </a>
+    <a href="calendar.html" class="bottom-nav-item">
+      <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      <span data-i18n="nav.calendar">Calendar</span>
+    </a>
+    <a href="notifications.html" class="bottom-nav-item relative">
+      <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+      <span data-i18n="nav.notifications">Alerts</span>
+    </a>
+    <a href="settings.html" class="bottom-nav-item">
+      <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.573-1.066z"/><circle cx="12" cy="12" r="3"/></svg>
+      <span data-i18n="nav.settings">Settings</span>
+    </a>
+  </nav>
+
+  <script type="module" src="../js/goals.js"></script>
+</body>
+</html>

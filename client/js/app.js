@@ -12,11 +12,30 @@
 
 import { t, setLanguage, getLanguage } from './i18n.js';
 import { initOfflineListeners } from './ui-states.js';
+import { signInWithGoogle } from './auth.js';
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 
 // Offline banner on every page
 initOfflineListeners();
+
+// ── Google Sign-In on Landing Page ────────────────────────────────────────────
+const googleLoginBtn = document.getElementById('btn-google-login');
+if (googleLoginBtn) {
+  googleLoginBtn.addEventListener('click', async () => {
+    const textEl = document.getElementById('landing-google-btn-text');
+    try {
+      googleLoginBtn.disabled = true;
+      if (textEl) textEl.textContent = 'Signing in with Google...';
+      await signInWithGoogle();
+      window.location.href = 'pages/dashboard.html';
+    } catch (err) {
+      if (textEl) textEl.textContent = 'Sign In with Google';
+      googleLoginBtn.disabled = false;
+      alert(err.message || 'Google Sign-In was cancelled.');
+    }
+  });
+}
 
 // ── Service Worker Registration ───────────────────────────────────────────────
 if ('serviceWorker' in navigator) {

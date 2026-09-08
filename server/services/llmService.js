@@ -3,7 +3,7 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 /**
- * Service to communicate with Google Gemini API for natural language understanding.
+ * Service to communicate with Google Gemini API for natural language understanding and responses.
  * Strictly executes server-side. Never exposes LLM_API_KEY to clients.
  */
 class LLMService {
@@ -35,32 +35,29 @@ class LLMService {
       return null;
     }
 
-    try {
-      const apiKey = process.env.LLM_API_KEY.trim();
-      const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({
-        model: 'gemini-1.5-flash',
-        generationConfig: {
-          responseMimeType: 'application/json',
-          temperature: 0.1, // Deterministic classification
-        },
-      });
+    const candidateModels = [
+      'gemini-3.6-flash',
+      'gemini-2.5-flash',
+    ];
 
-      const goalsContext = familyGoals.map(g => ({
-        id: g.id,
-        name: g.name,
-        category: g.category,
-        targetAmount: g.targetAmount,
-        savedAmount: g.savedAmount,
-      }));
+    const apiKey = process.env.LLM_API_KEY.trim();
+    const genAI = new GoogleGenerativeAI(apiKey);
 
-      const historyContext = conversationHistory.slice(-6).map(msg => ({
-        role: msg.role === 'user' ? 'user' : 'model',
-        text: msg.text || msg.message || '',
-      }));
+    const goalsContext = familyGoals.map(g => ({
+      id: g.id,
+      name: g.name,
+      category: g.category,
+      targetAmount: g.targetAmount,
+      savedAmount: g.savedAmount,
+    }));
 
-      const systemPrompt = `You are Sanchay+ Conversational AI Assistant, a compassionate micro-savings assistant for Indian families.
-Analyze the user's message and determine the user's intent, extract entities, and detect the language.
+    const historyContext = conversationHistory.slice(-6).map(msg => ({
+      role: msg.role === 'user' ? 'user' : 'model',
+      text: msg.text || msg.message || '',
+    }));
+
+    const systemPrompt = `You are Sanchay+ Conversational AI Assistant, an empathetic, encouraging smart micro-savings companion for Indian families.
+Analyze the user's message, determine intent, extract entities, identify the exact language/dialect, and craft a natural reply in that same language.
 
 SUPPORTED LANGUAGES:
 - mr (Marathi)
@@ -75,23 +72,26 @@ SUPPORTED LANGUAGES:
 - pa (Punjabi)
 
 CRITICAL RULES:
-1. Detect the user's input language. Even for code-mixed queries like "School fees mein ₹50 daal do", identify the dominant Indian language (Hindi in this case) or English.
+1. Detect user language accurately (e.g. Hindi, Marathi, English, or Code-Mixed Hinglish/Marathi-English like "School fees madhe ₹50 taka" or "School fees mein ₹50 daal do").
 2. SUPPORTED INTENTS:
-   - "record_deposit": User wants to save/add money to a goal (e.g., "Saved ₹100", "आज ₹50 जमा किए", "Add 50 to school fees").
-   - "check_progress": User asks about current savings or progress of a goal or overall (e.g., "How is my school fees goal?", "माझा अभ्यास ध्येय कसा आहे?").
-   - "check_health": User asks if they are on track or behind (e.g., "Am I on track?", "Is my goal at risk?").
-   - "get_prediction": User asks how long it will take, how much daily is needed, or shortfall (e.g., "How much daily for school fees?", "When will I reach my goal?").
-   - "list_goals": User asks to see all their goals (e.g., "What are my goals?", "माझे ध्येय दाखवा", "लक्ष्य दिखाओ").
-   - "savings_tip": User asks for savings tips, encouragement, or financial advice (e.g., "Give me a tip", "बचत कशी वाढवू?").
-   - "check_notifications": User asks if there are any updates, alerts, or reminders (e.g., "Any updates for me?", "कोणत्या सूचना आहेत का?").
-   - "unknown": Unclear, gibberish, or irrelevant queries.
+   - "record_deposit": User wants to save/deposit money (e.g. "Saved ₹100", "आज ₹50 जमा किए", "Add 50 to school fees").
+   - "check_progress": User asks about current savings/progress of a goal or overall.
+   - "check_health": User asks if they are on track or behind.
+   - "get_prediction": User asks how long it will take or how much daily is needed.
+   - "list_goals": User asks to see their goals.
+   - "savings_tip": User asks for savings tips, encouragement, or financial advice.
+   - "check_notifications": User asks if there are any updates or reminders.
+   - "general_chat": Greetings, polite conversation, asking "who are you", "what can you do", "help".
+   - "unknown": Truly unintelligible or unrelated queries.
 3. ENTITIES TO EXTRACT:
-   - "amount": Parsed numeric value (e.g. 50, 100, 200). Resolve number words in Hindi/Marathi/English/regional languages. Null if not specified.
-   - "goalNameGuess": The name or keyword of the goal referenced.
-   - "matchedGoalId": If the goal matches one in the provided ACTIVE FAMILY GOALS, return its exact id. Look at conversation context if user says "that", "it", or "same goal".
+   - "amount": Parsed numeric value (e.g. 50, 100, 200). Resolve number words in Indic languages. Null if not mentioned.
+   - "goalNameGuess": Name/keyword of the referenced goal.
+   - "matchedGoalId": If the goal matches one in ACTIVE FAMILY GOALS, return its exact id.
    - "date": Date mentioned or "today".
-4. CONFIDENCE: "high", "medium", or "low".
-5. IMPORTANT: DO NOT invent financial numbers or make up calculations.
+4. GENERATE NATURAL RESPONSE:
+   - "naturalReplyText": A warm, encouraging, helpful reply written naturally in the DETECTED LANGUAGE (using native script e.g. Devanagari for Hindi/Marathi, or English if user wrote English).
+   - "naturalReplySpeech": A clean spoken version suitable for Text-to-Speech (no emojis, asterisks, or markdown symbols).
+5. DO NOT invent false balances or fake mathematical calculations.
 
 ACTIVE FAMILY GOALS:
 ${JSON.stringify(goalsContext, null, 2)}
@@ -104,7 +104,7 @@ ${appLanguage}
 
 Respond ONLY with a JSON object matching this schema:
 {
-  "intent": "record_deposit" | "check_progress" | "check_health" | "get_prediction" | "list_goals" | "savings_tip" | "check_notifications" | "unknown",
+  "intent": "record_deposit" | "check_progress" | "check_health" | "get_prediction" | "list_goals" | "savings_tip" | "check_notifications" | "general_chat" | "unknown",
   "entities": {
     "amount": number | null,
     "goalNameGuess": string | null,
@@ -113,34 +113,51 @@ Respond ONLY with a JSON object matching this schema:
   },
   "detectedLanguage": "mr" | "hi" | "en" | "bn" | "gu" | "ta" | "te" | "kn" | "ml" | "pa",
   "confidence": "high" | "medium" | "low",
-  "suggestedTone": "encouraging" | "informative" | "clarifying"
+  "suggestedTone": "encouraging" | "informative" | "clarifying",
+  "naturalReplyText": string,
+  "naturalReplySpeech": string
 }`;
 
-      const result = await model.generateContent([
-        { text: systemPrompt },
-        { text: `USER MESSAGE: "${message}"` }
-      ]);
+    for (const modelName of candidateModels) {
+      try {
+        const model = genAI.getGenerativeModel({
+          model: modelName,
+          generationConfig: {
+            responseMimeType: 'application/json',
+            temperature: 0.2,
+          },
+        });
 
-      const responseText = result.response.text();
-      const parsed = JSON.parse(responseText);
+        const result = await model.generateContent([
+          { text: systemPrompt },
+          { text: `USER MESSAGE: "${message}"` }
+        ]);
 
-      return {
-        intent: parsed.intent || 'unknown',
-        entities: {
-          amount: typeof parsed.entities?.amount === 'number' ? parsed.entities.amount : null,
-          goalNameGuess: parsed.entities?.goalNameGuess || null,
-          matchedGoalId: parsed.entities?.matchedGoalId || null,
-          date: parsed.entities?.date || 'today',
-        },
-        detectedLanguage: parsed.detectedLanguage || appLanguage || 'en',
-        confidence: parsed.confidence || 'medium',
-        suggestedTone: parsed.suggestedTone || 'informative',
-      };
-    } catch (err) {
-      // Log technical error server-side ONLY without exposing keys
-      console.error('[LLMService] Gemini API call failed or timed out:', err.message);
-      return null;
+        const responseText = result.response.text();
+        const parsed = JSON.parse(responseText);
+
+        return {
+          intent: parsed.intent || 'unknown',
+          entities: {
+            amount: typeof parsed.entities?.amount === 'number' ? parsed.entities.amount : null,
+            goalNameGuess: parsed.entities?.goalNameGuess || null,
+            matchedGoalId: parsed.entities?.matchedGoalId || null,
+            date: parsed.entities?.date || 'today',
+          },
+          detectedLanguage: parsed.detectedLanguage || appLanguage || 'en',
+          confidence: parsed.confidence || 'high',
+          suggestedTone: parsed.suggestedTone || 'encouraging',
+          naturalReplyText: parsed.naturalReplyText || null,
+          naturalReplySpeech: parsed.naturalReplySpeech || null,
+        };
+      } catch (err) {
+        console.warn(`[LLMService] Model ${modelName} attempt failed: ${err.message}`);
+        // Try next candidate model in list
+      }
     }
+
+    console.error('[LLMService] All Gemini candidate models failed. Falling back to Indic rule-based parser.');
+    return null;
   }
 }
 

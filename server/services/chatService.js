@@ -433,18 +433,21 @@ class ChatService {
           replySpeech = t.noGoalsSpeech;
         } else {
           const progress = await PredictionService.getProgress(goalToInspect.id, familyId);
-          replyText = t.progressReport(goalToInspect.name, progress.savedAmount, progress.targetAmount, progress.progressPercent);
-          replySpeech = t.progressSpeech(goalToInspect.name, progress.savedAmount, progress.targetAmount, progress.progressPercent);
+          const pct = (progress && progress.percentage !== undefined) ? progress.percentage : (progress?.progressPercent || 0);
+          const savedAmt = progress?.savedAmount || goalToInspect.savedAmount || 0;
+          const tgtAmt = progress?.targetAmount || goalToInspect.targetAmount || 0;
+          replyText = t.progressReport(goalToInspect.name, savedAmt, tgtAmt, pct);
+          replySpeech = t.progressSpeech(goalToInspect.name, savedAmt, tgtAmt, pct);
           uiCard = {
             type: 'goal_progress',
             data: {
               goalId: goalToInspect.id,
               goalName: goalToInspect.name,
               category: goalToInspect.category,
-              savedAmount: progress.savedAmount,
-              targetAmount: progress.targetAmount,
-              progressPercent: progress.progressPercent,
-              status: progress.status,
+              savedAmount: savedAmt,
+              targetAmount: tgtAmt,
+              progressPercent: pct,
+              status: progress?.isCompleted ? 'COMPLETED' : 'ON_TRACK',
             },
           };
         }
@@ -563,9 +566,31 @@ class ChatService {
         break;
       }
 
+      case 'general_chat': {
+        replyText = nluResult.naturalReplyText || "Hello! I am your Sanchay+ savings assistant. How can I help you today?";
+        replySpeech = nluResult.naturalReplySpeech || replyText;
+        uiCard = {
+          type: 'help_options',
+          data: {
+            suggestions: [
+              'Save ₹50 to School Fees',
+              'How is my goal progress?',
+              'Am I on track?',
+              'What are my goals?',
+            ],
+          },
+        };
+        break;
+      }
+
       default: {
-        replyText = t.unknown;
-        replySpeech = t.unknownSpeech;
+        if (nluResult.naturalReplyText && nluResult.naturalReplyText.length > 5) {
+          replyText = nluResult.naturalReplyText;
+          replySpeech = nluResult.naturalReplySpeech || replyText;
+        } else {
+          replyText = t.unknown;
+          replySpeech = t.unknownSpeech;
+        }
         uiCard = {
           type: 'help_options',
           data: {

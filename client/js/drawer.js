@@ -6,7 +6,7 @@
  */
 
 import { getLanguage, setLanguage, t } from './i18n.js';
-import { authFetch } from './auth.js';
+import { authFetch, getMockUser, signInWithGoogle } from './auth.js';
 
 // ── Inject Dedicated CSS for 60fps Smooth Transitions ─────────────────────────
 function injectDrawerStyles() {
@@ -171,6 +171,7 @@ function renderDrawerDOM() {
 
   // Detect active page to highlight current link
   const currentPath = window.location.pathname;
+  const user = getMockUser();
 
   panel.innerHTML = `
     <!-- Header -->
@@ -181,7 +182,7 @@ function renderDrawerDOM() {
         </div>
         <div>
           <h2 class="text-base font-extrabold tracking-tight text-white leading-tight">Sanchay+</h2>
-          <p class="text-[11px] text-emerald-100 font-medium">Small savings. Big goals.</p>
+          <p class="text-[11px] text-emerald-100 font-medium">${user.memberName || 'Family Member'} (${user.familyName || 'Patil Family'})</p>
         </div>
       </div>
       <button id="sanchay-drawer-close" class="p-2 rounded-xl text-white/80 hover:text-white hover:bg-white/10 active:scale-90 transition-all" aria-label="Close menu">
@@ -191,6 +192,20 @@ function renderDrawerDOM() {
 
     <!-- Scrollable Content -->
     <div class="sanchay-drawer-content">
+
+      <!-- User / Google Sync Status Banner -->
+      <div class="mb-3 p-2.5 rounded-xl ${user.email ? 'bg-blue-50 border border-blue-200' : 'bg-emerald-50 border border-emerald-200'} flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-base">${user.email ? '🌐' : '👤'}</span>
+          <div>
+            <p class="text-xs font-bold text-gray-900 leading-tight">${user.email ? user.email.split('@')[0] : (user.memberName || 'Arun Patil')}</p>
+            <p class="text-[10px] text-gray-500">${user.email ? 'Google Cloud Synced' : 'Offline / Demo Mode'}</p>
+          </div>
+        </div>
+        <button id="drawer-google-signin-btn" class="px-2 py-1 rounded-lg text-[11px] font-bold ${user.email ? 'bg-blue-600 text-white' : 'bg-emerald-700 text-white'} hover:opacity-90 active:scale-95 transition-all">
+          ${user.email ? 'Switch' : 'Google Auth'}
+        </button>
+      </div>
 
       <!-- Section 1: Highlighted Smart Features -->
       <div class="drawer-section-label">🌟 Smart Features</div>
@@ -405,6 +420,21 @@ function wireDrawerEvents() {
     const lang = btn.dataset.lang;
     setLanguage(lang);
     window.location.reload();
+  });
+
+  // Google Sign-In button in drawer
+  const drawerGoogleBtn = document.getElementById('drawer-google-signin-btn');
+  drawerGoogleBtn?.addEventListener('click', async () => {
+    try {
+      drawerGoogleBtn.disabled = true;
+      drawerGoogleBtn.textContent = '...';
+      await signInWithGoogle();
+      window.location.reload();
+    } catch (err) {
+      alert(err.message || 'Google Sign-In was cancelled.');
+      drawerGoogleBtn.disabled = false;
+      drawerGoogleBtn.textContent = 'Google Auth';
+    }
   });
 
   // Reset Demo Data button

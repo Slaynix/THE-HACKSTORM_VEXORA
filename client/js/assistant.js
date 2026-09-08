@@ -59,21 +59,41 @@ function formatMessageText(text) {
 }
 
 // ── Voice Output (SpeechSynthesis) ────────────────────────────────────────────
+let _cachedVoices = [];
+function getAvailableVoices() {
+  if (_cachedVoices && _cachedVoices.length > 0) return _cachedVoices;
+  if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    _cachedVoices = window.speechSynthesis.getVoices();
+  }
+  return _cachedVoices || [];
+}
+if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+  window.speechSynthesis.onvoiceschanged = () => {
+    _cachedVoices = window.speechSynthesis.getVoices();
+  };
+}
+
 function speakText(text, langCode = 'en') {
   if (isVoiceMuted || !('speechSynthesis' in window)) return;
   if (!text || text.trim().length === 0) return;
 
   try {
     window.speechSynthesis.cancel(); // Stop any pending utterances
-    const clean = text.replace(/[✓💡🎯🎓📊•]/g, '').trim();
+    const clean = text.replace(/[✓💡🎯🎓📊•#*]/g, '').trim();
     const utterance = new SpeechSynthesisUtterance(clean);
-    utterance.lang = LANG_LOCALES[langCode] || 'en-IN';
-    utterance.rate = 0.95; // Slightly slower for clarity in rural contexts
+    const targetLocale = LANG_LOCALES[langCode] || 'en-IN';
+    utterance.lang = targetLocale;
+    utterance.rate = 0.95;
 
-    // Find matching voice if available
-    const voices = window.speechSynthesis.getVoices();
-    if (voices && voices.length > 0) {
-      const match = voices.find(v => v.lang === utterance.lang || v.lang.startsWith(langCode));
+    const voices = getAvailableVoices();
+    if (voices.length > 0) {
+      let match = voices.find(v => v.lang === targetLocale || v.lang.replace('_', '-') === targetLocale);
+      if (!match) {
+        match = voices.find(v => v.lang.startsWith(langCode));
+      }
+      if (!match) {
+        match = voices.find(v => v.lang.includes('IN') || v.name.toLowerCase().includes('india'));
+      }
       if (match) utterance.voice = match;
     }
 
@@ -364,27 +384,56 @@ function setupSpeechRecognition() {
     return;
   }
 
+  const voiceLangSelect = document.getElementById('voice-lang-select');
+  const interimTextEl   = document.getElementById('voice-interim-text');
+  const bannerStatus    = document.getElementById('voice-banner-status');
+
   recognition = new SpeechRec();
   recognition.continuous = false;
-  recognition.interimResults = false;
+  recognition.interimResults = true;
+  recognition.maxAlternatives = 3;
 
   recognition.onstart = () => {
     isListening = true;
     micBtn.classList.add('bg-red-500', 'text-white', 'listening-pulse');
     micBtn.classList.remove('bg-emerald-50', 'text-emerald-700');
     if (voiceBanner) voiceBanner.classList.remove('hidden');
+    if (bannerStatus) bannerStatus.textContent = 'Listening… Speak now';
+    if (interimTextEl) interimTextEl.textContent = 'Listening...';
   };
 
   recognition.onresult = (event) => {
-    const transcript = event.results[0][0].transcript;
-    stopListening();
-    if (transcript && transcript.trim().length > 0) {
-      handleSendMessage(transcript.trim(), 'voice');
+    let interim = '';
+    let finalTranscript = '';
+
+    for (let i = event.resultIndex; i < event.results.length; ++i) {
+      if (event.results[i].isFinal) {
+        finalTranscript += event.results[i][0].transcript;
+      } else {
+        interim += event.results[i][0].transcript;
+      }
+    }
+
+    if (interim && interimTextEl) {
+      interimTextEl.textContent = `"${interim}"`;
+      if (chatInput) chatInput.value = interim;
+    }
+
+    if (finalTranscript && finalTranscript.trim().length > 0) {
+      if (chatInput) chatInput.value = finalTranscript.trim();
+      if (interimTextEl) interimTextEl.textContent = `✓ "${finalTranscript.trim()}"`;
+      stopListening();
+      handleSendMessage(finalTranscript.trim(), 'voice');
     }
   };
 
   recognition.onerror = (event) => {
     console.warn('[Assistant] Speech recognition error:', event.error);
+    if (event.error === 'not-allowed') {
+      alert('Microphone permission was blocked. Please allow microphone access in your browser settings to use voice input.');
+    } else if (event.error === 'no-speech') {
+      if (interimTextEl) interimTextEl.textContent = 'No speech heard. Tap mic to try again.';
+    }
     stopListening();
   };
 
@@ -398,18 +447,23 @@ function startListening() {
     setupSpeechRecognition();
   }
   if (!recognition) {
-    alert('Voice input is not supported on this device. You can type your message!');
+    alert('Voice input is not supported in this browser. Please use Chrome or Edge, or type your message!');
     return;
   }
 
+  const voiceLangSelect = document.getElementById('voice-lang-select');
   const appLang = getLanguage();
-  recognition.lang = LANG_LOCALES[appLang] || 'en-IN';
+  const selectedLocale = (voiceLangSelect && voiceLangSelect.value)
+    ? voiceLangSelect.value
+    : (LANG_LOCALES[appLang] || 'en-IN');
+
+  recognition.lang = selectedLocale;
 
   try {
     recognition.start();
   } catch (e) {
-    // If already started, stop
     stopListening();
+    try { recognition.start(); } catch (_) {}
   }
 }
 
@@ -457,6 +511,20 @@ function init() {
   applyI18n();
   initVoiceMute();
   setupSpeechRecognition();
+
+  // Voice language selector sync
+  const voiceLangSelect = document.getElementById('voice-lang-select');
+  if (voiceLangSelect) {
+    const currentLang = getLanguage();
+    if (LANG_LOCALES[currentLang]) {
+      voiceLangSelect.value = LANG_LOCALES[currentLang];
+    }
+    voiceLangSelect.addEventListener('change', () => {
+      if (recognition) {
+        recognition.lang = voiceLangSelect.value;
+      }
+    });
+  }
 
   // Persistent conversationId for the session
   conversationId = sessionStorage.getItem('sanchay_conv_id') || `conv-${Date.now()}`;

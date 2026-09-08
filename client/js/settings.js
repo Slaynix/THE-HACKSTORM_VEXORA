@@ -10,13 +10,18 @@
  */
 
 import { setLanguage, t, applyI18n, getLanguage } from './i18n.js';
-import { getMockUser, saveMockUser, signOut } from './auth.js';
+import { getMockUser, saveMockUser, signOut, signInWithGoogle } from './auth.js';
 import { showToast, initOfflineListeners } from './ui-states.js';
 import { navigateToLanding } from './router.js';
 
 // ── DOM References ────────────────────────────────────────────────────────────
 const familyNameEl     = document.getElementById('settings-family-name');
 const memberNameEl     = document.getElementById('settings-member-name');
+const emailRowEl       = document.getElementById('settings-email-row');
+const emailEl          = document.getElementById('settings-email');
+const googleBtnEl      = document.getElementById('settings-google-signin-btn');
+const googleBtnTextEl  = document.getElementById('settings-google-btn-text');
+const authBadgeEl      = document.getElementById('settings-auth-badge');
 const onlineStatusEl   = document.getElementById('settings-online-status');
 const statusDotEl      = document.getElementById('settings-status-dot');
 const notifToggleEl    = document.getElementById('settings-notif-toggle');
@@ -44,6 +49,29 @@ function updateNetworkStatus() {
   }
 }
 
+function refreshUserProfile() {
+  const user = getMockUser();
+  if (familyNameEl) familyNameEl.textContent = user.familyName || 'Patil';
+  if (memberNameEl) memberNameEl.textContent = user.memberName || 'Arun';
+
+  if (user.email) {
+    if (emailRowEl) emailRowEl.classList.remove('hidden');
+    if (emailEl) emailEl.textContent = user.email;
+    if (googleBtnTextEl) googleBtnTextEl.textContent = `Connected as ${user.email.split('@')[0]}`;
+    if (authBadgeEl) {
+      authBadgeEl.textContent = 'Google Synced';
+      authBadgeEl.className = 'px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-100 text-blue-800';
+    }
+  } else {
+    if (emailRowEl) emailRowEl.classList.add('hidden');
+    if (googleBtnTextEl) googleBtnTextEl.textContent = 'Sign In with Google (Firebase)';
+    if (authBadgeEl) {
+      authBadgeEl.textContent = 'Demo Mode';
+      authBadgeEl.className = 'px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800';
+    }
+  }
+}
+
 // ── Initialise Page ───────────────────────────────────────────────────────────
 
 function init() {
@@ -54,10 +82,27 @@ function init() {
   window.addEventListener('online', updateNetworkStatus);
   window.addEventListener('offline', updateNetworkStatus);
 
-  // 1. Populate Family Info
+  // 1. Populate Family & Google Info
   const user = getMockUser();
-  if (familyNameEl) familyNameEl.textContent = user.familyName || 'Patil';
-  if (memberNameEl) memberNameEl.textContent = user.memberName || 'Arun';
+  refreshUserProfile();
+
+  // Wire Google Sign-in
+  if (googleBtnEl) {
+    googleBtnEl.addEventListener('click', async () => {
+      try {
+        googleBtnEl.disabled = true;
+        if (googleBtnTextEl) googleBtnTextEl.textContent = 'Signing in with Google...';
+        await signInWithGoogle();
+        showToast('✓ Signed in with Google via Firebase!', 'success');
+        refreshUserProfile();
+      } catch (err) {
+        showToast(err.message || 'Google Sign-In cancelled', 'error');
+        refreshUserProfile();
+      } finally {
+        googleBtnEl.disabled = false;
+      }
+    });
+  }
 
   // 2. Setup Language selector
   const currentLang = getLanguage();
@@ -67,7 +112,7 @@ function init() {
     opt.addEventListener('click', () => {
       const lang = opt.dataset.lang;
       setLanguage(lang);
-      saveMockUser({ ...user, language: lang });
+      saveMockUser({ ...getMockUser(), language: lang });
       _updateLangRadioStates(lang);
       applyI18n();
       updateNetworkStatus();

@@ -50,6 +50,20 @@ const AuthController = {
   },
 
   /**
+   * POST /api/auth/google
+   * Authenticates user via Google Firebase ID token or profile.
+   */
+  async googleLogin(req, res, next) {
+    try {
+      const { idToken, email, displayName, photoUrl, googleUid } = req.body;
+      const result = await AuthService.googleLogin({ idToken, email, displayName, photoUrl, googleUid });
+      res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /**
    * POST /api/auth/logout
    */
   async logout(_req, res) {

@@ -131,11 +131,31 @@
     <div id="voice-banner" class="hidden mb-2 p-3 rounded-2xl bg-emerald-600 text-white shadow-md flex items-center justify-between">
       <div class="flex items-center gap-2.5">
         <span class="w-3 h-3 rounded-full bg-white listening-pulse"></span>
-        <span class="text-xs font-bold" data-i18n="assistant.listening">Listening… Speak in your language</span>
+        <span id="voice-banner-status" class="text-xs font-bold" data-i18n="assistant.listening">Listening… Speak now</span>
       </div>
       <button type="button" id="cancel-voice-btn" class="text-xs bg-white/20 hover:bg-white/30 px-2.5 py-1 rounded-xl font-bold">
         Stop
       </button>
+    </div>
+
+    <!-- Voice Dialect Pill & Interim Transcript -->
+    <div class="flex items-center justify-between px-2 mb-1.5 text-[11px] text-gray-500">
+      <div class="flex items-center gap-1.5 font-bold">
+        <span>🎙️ Listening in:</span>
+        <select id="voice-lang-select" class="bg-white border border-gray-200 text-gray-800 rounded-lg px-2 py-0.5 text-[11px] font-semibold focus:outline-none focus:ring-1 focus:ring-emerald-500">
+          <option value="hi-IN">Hindi (हिंदी)</option>
+          <option value="mr-IN">Marathi (मराठी)</option>
+          <option value="en-IN" selected>English (India)</option>
+          <option value="gu-IN">Gujarati (ગુજરાતી)</option>
+          <option value="bn-IN">Bengali (বাংলা)</option>
+          <option value="ta-IN">Tamil (தமிழ்)</option>
+          <option value="te-IN">Telugu (తెలుగు)</option>
+          <option value="kn-IN">Kannada (ಕನ್ನಡ)</option>
+          <option value="ml-IN">Malayalam (മലയാളം)</option>
+          <option value="pa-IN">Punjabi (ਪੰਜਾਬੀ)</option>
+        </select>
+      </div>
+      <span id="voice-interim-text" class="text-emerald-700 font-medium italic truncate max-w-[180px]"></span>
     </div>
 
     <!-- ── Input Dock ────────────────────────────────────────────────────────── -->

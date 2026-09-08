@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "nodemon server/server.js",
     "start": "node server/server.js",
+    "build": "tailwindcss -i ./client/css/input.css -o ./client/css/output.css --minify",
     "seed": "node server/scripts/seed.js",
     "test": "node server/tests/savingsEngine.test.js && node server/tests/api.test.js && node server/tests/phase3Firebase.test.js && node server/tests/phase5EndToEnd.test.js && node server/tests/phase6Chat.test.js && node server/tests/phase7OfflineSync.test.js && node server/tests/phase8CalendarRecovery.test.js",
     "build:css": "tailwindcss -i ./client/css/input.css -o ./client/css/output.css",
@@ -19,11 +20,11 @@
     "express-validator": "^7.2.0",
     "firebase-admin": "^12.3.0",
     "helmet": "^7.1.0",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "tailwindcss": "^3.4.7"
   },
   "devDependencies": {
-    "nodemon": "^3.1.4",
-    "tailwindcss": "^3.4.7"
+    "nodemon": "^3.1.4"
   },
   "engines": {
     "node": ">=18.0.0"

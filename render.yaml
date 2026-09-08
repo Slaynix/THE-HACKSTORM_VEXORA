@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: sanchay-plus
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: node server/server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: LLM_API_KEY
+        sync: false
+      - key: LLM_PROVIDER
+        value: gemini
+      - key: FIREBASE_PROJECT_ID
+        value: datathon-b7680
+      - key: FIREBASE_API_KEY
+        value: AIzaSyAGQAj6XPNpXwKwsM4X84ajseojAyWj-lM
+      - key: FIREBASE_AUTH_DOMAIN
+        value: datathon-b7680.firebaseapp.com
+      - key: FIREBASE_APP_ID
+        value: 1:211042742334:web:10ff4e3ede1ebd6e56616f
+      - key: FIREBASE_MESSAGING_SENDER_ID
+        value: 211042742334

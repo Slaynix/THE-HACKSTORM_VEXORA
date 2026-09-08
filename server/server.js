@@ -21,12 +21,21 @@ const { verifyToken }     = require('./middleware/auth');
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
+const path = require('path');
+const { seedDatabase } = require('./scripts/seed');
+
 // ── Security & utility middleware ─────────────────────────────────────────────
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+}));
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// ── Serve static frontend files directly from Express ─────────────────────────
+app.use(express.static(path.join(__dirname, '../client')));
 
 // ── Health-check ──────────────────────────────────────────────────────────────
 app.get('/health', (_req, res) =>
@@ -48,7 +57,6 @@ app.get('/api/config', (_req, res) => {
 });
 
 // ── Seeding endpoint (for demo / dev setup) ──────────────────────────────────
-const { seedDatabase } = require('./scripts/seed');
 app.post('/api/seed', async (_req, res, next) => {
   try {
     const summary = await seedDatabase();
@@ -71,13 +79,26 @@ app.use('/api/chat',          verifyToken, chatRouter);
 app.use('/api/sync',          verifyToken, syncRouter);
 app.use('/api/users',         verifyToken, usersRouter);
 
-// ── 404 catch-all ─────────────────────────────────────────────────────────────
-app.use((_req, res) => res.status(404).json({ error: 'Route not found' }));
+// ── Root redirect to dashboard ────────────────────────────────────────────────
+app.get('/', (_req, res) => {
+  res.redirect('/pages/dashboard.html');
+});
+
+// ── 404 API handler ───────────────────────────────────────────────────────────
+app.use('/api/*', (_req, res) => res.status(404).json({ error: 'Route not found' }));
+
+// ── Fallback for single-page routing ──────────────────────────────────────────
+app.use((_req, res) => {
+  res.redirect('/pages/dashboard.html');
+});
 
 // ── Global error handler ──────────────────────────────────────────────────────
 app.use(errorHandler);
 
 if (process.env.NODE_ENV !== 'test') {
+  // Auto-seed in development mode on startup so all features work immediately
+  seedDatabase().catch(err => console.warn('[AutoSeed] Startup notice:', err.message));
+
   app.listen(PORT, () => {
     console.log(`[Sanchay+] Server running on http://localhost:${PORT} (${process.env.NODE_ENV || 'development'})`);
   });

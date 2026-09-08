@@ -18,6 +18,7 @@ const APP_SHELL_URLS = [
   '/pages/create-goal.html',
   '/pages/assistant.html',
   '/pages/calendar.html',
+  '/pages/features.html',
   '/pages/notifications.html',
   '/pages/settings.html',
   '/pages/onboarding.html',

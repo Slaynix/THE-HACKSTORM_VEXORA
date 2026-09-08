@@ -26,16 +26,27 @@
           <p class="text-xs text-gray-500" data-i18n="dashboard.activeGoalsTitle">Track and manage your savings milestones</p>
         </div>
       </div>
-      <a href="create-goal.html" class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 active:scale-95 transition-all shadow-sm min-h-[44px]">
-        <span>➕</span>
-        <span data-i18n="goals.createButton">+ New Goal</span>
-      </a>
+      <div class="flex items-center gap-2">
+        <a href="features.html" class="px-2.5 py-1.5 rounded-xl bg-emerald-100/70 hover:bg-emerald-200 text-emerald-800 text-xs font-bold transition-all" title="View all features">
+          ✨ Features
+        </a>
+        <a href="create-goal.html" class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 active:scale-95 transition-all shadow-sm min-h-[44px]">
+          <span>➕</span>
+          <span data-i18n="goals.createButton">+ New Goal</span>
+        </a>
+      </div>
     </header>
 
     <!-- Goals List Container -->
     <div id="goals-container" class="space-y-3 mb-6"></div>
 
   </main>
+
+  <!-- Floating Assistant Button -->
+  <a href="assistant.html" class="fixed bottom-20 right-4 z-40 flex items-center gap-2 px-3.5 py-2.5 rounded-full bg-purple-600 text-white font-bold text-xs shadow-xl hover:bg-purple-700 active:scale-95 transition-all" aria-label="Open AI Assistant">
+    <span class="text-base">🤖</span>
+    <span>Ask AI</span>
+  </a>
 
   <!-- ── Bottom Navigation ────────────────────────────────────────────────── -->
   <nav class="bottom-nav" aria-label="Main navigation">

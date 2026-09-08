@@ -43,7 +43,11 @@ async function verifyToken(req, res, next) {
     let resolvedUid = defaultUser.uid;
     if (idToken.startsWith('mock-token-')) {
       const candidateUid = idToken.slice('mock-token-'.length).trim();
-      if (candidateUid) resolvedUid = candidateUid;
+      if (candidateUid === 'Arun' || candidateUid === 'default') {
+        resolvedUid = defaultUser.uid;
+      } else if (candidateUid) {
+        resolvedUid = candidateUid;
+      }
     }
     req.uid = resolvedUid;
     try {

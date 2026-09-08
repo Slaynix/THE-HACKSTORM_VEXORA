@@ -70,7 +70,7 @@ export async function getIdToken() {
   } catch (_) {}
 
   // Dev fallback token
-  const devToken = `mock-token-${getMockUser().memberName || 'user-patil-1'}`;
+  const devToken = `mock-token-${getMockUser().uid || 'user-patil-1'}`;
   return devToken;
 }
 
